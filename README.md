@@ -1,2 +1,2 @@
 # mini-react
-mini react带你精通react
+mini react带你精通react18
