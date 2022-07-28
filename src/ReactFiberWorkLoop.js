@@ -1,12 +1,12 @@
 import { updateClassComponent, updateFunctionComponent, updateHostComponent, updateHostTextComponent,updateFragmentComponent } from "./ReactFiberReconciler";
 import { Fragment, HostComponent,FunctionComponent,ClassComponent, HostText } from "./ReactWorkTags";
 import { scheduleCallback } from "./scheduler";
-import { Placement } from "./utlis";
+import { Placement, Update, updateNode } from "./utlis";
 
 let wip = null; //work in progress 当前正在工作中的
 let wipRoot = null;
 
-//组件初次渲染
+//组件初次渲染和更新
 export function scheduleUpdateOnFiber(fiber){
     
     wip = fiber 
@@ -113,6 +113,12 @@ function commitWorker(wip){
     if(flags & Placement && stateNode){
         parentNode.appendChild(stateNode)
     }
+
+    if(flags & Update && stateNode){
+        //更新属性  （节点，老fiber，新fiber）
+        updateNode(stateNode,wip.alternate.props,wip.props)
+    }
+
     //2.提交子节点
     commitWorker(wip.child)
     //3.提交兄弟节点

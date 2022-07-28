@@ -22,7 +22,13 @@ export function createFiber(vnode,returnFiber){
         flags:Placement,
 
         //记录节点在当前层级下的位置
-        index:null
+        index:null,
+
+        //old fiber
+        alternate:null,
+
+        //存hook链表的,存hook0
+        memorizedState:null
 
     }
 
