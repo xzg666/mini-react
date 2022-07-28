@@ -26,10 +26,11 @@ export function isArray(arr) {
 }
 
 //加属性
-//old props {classname:'red',id:'_id'}
-//new props {class:'green'}
+//old props {classname:'red',id:'_id'} 
+//new props {class:'green'}  先要去掉id
 export function updateNode(node,prevVal,nextVal){
 
+  //先移除之前节点的属性
   Object.keys(prevVal).forEach(k=>{
     if(k === 'children'){
       //文本
@@ -39,8 +40,9 @@ export function updateNode(node,prevVal,nextVal){
     }else if(k.slice(0,2) === 'on'){
       //fake事件，react是使用合成事件
       const eventName = k.slice(2).toLocaleLowerCase()
-      node.addEventListener(eventName,prevVal[k])
+      node.removeEventListener(eventName,prevVal[k])
     }else{
+      //k不在新的值中，那就清空
       if(!(k in nextVal)){
         node[k] = ''
       }
@@ -48,12 +50,13 @@ export function updateNode(node,prevVal,nextVal){
     }
   })
 
+  //添加新的属性
   //nextval =  props: {children: 'react'}
   Object.keys(nextVal).forEach(k=>{
     if(k === 'children'){
       //文本
       if(isStringOrNumber(nextVal[k])){
-        node.textContent = nextVal[k]
+        node.textContent = nextVal[k]+''
       }
     }else if(k.slice(0,2) === 'on'){
       //fake事件，react是使用合成事件
