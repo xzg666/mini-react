@@ -63,6 +63,7 @@ function reconcileChildren(wip,children){
         const newFiber = createFiber(newChild,wip)//这里每次都创建fiber子节点
         const same = sameNode(newFiber,oldFiber)
 
+        //节点复用
         if(same){
             Object.assign(newFiber,{
                 stateNode:oldFiber.stateNode,
@@ -71,7 +72,7 @@ function reconcileChildren(wip,children){
             })
         }
 
-        //??
+        //因为i++了需要重新赋值下一个兄弟节点
         if(oldFiber){
             oldFiber = oldFiber.sibling
         }
