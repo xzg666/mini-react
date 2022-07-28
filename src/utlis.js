@@ -25,15 +25,42 @@ export function isArray(arr) {
   return Array.isArray(arr);
 }
 
-export function updateNode(node,nextVal){
+//加属性
+//old props {classname:'red',id:'_id'}
+//new props {class:'green'}
+export function updateNode(node,prevVal,nextVal){
+
+  Object.keys(prevVal).forEach(k=>{
+    if(k === 'children'){
+      //文本
+      if(isStringOrNumber(prevVal[k])){
+        node.textContent = ''
+      }
+    }else if(k.slice(0,2) === 'on'){
+      //fake事件，react是使用合成事件
+      const eventName = k.slice(2).toLocaleLowerCase()
+      node.addEventListener(eventName,prevVal[k])
+    }else{
+      if(!(k in nextVal)){
+        node[k] = ''
+      }
+      
+    }
+  })
+
   //nextval =  props: {children: 'react'}
   Object.keys(nextVal).forEach(k=>{
     if(k === 'children'){
+      //文本
       if(isStringOrNumber(nextVal[k])){
         node.textContent = nextVal[k]
       }
+    }else if(k.slice(0,2) === 'on'){
+      //fake事件，react是使用合成事件
+      const eventName = k.slice(2).toLocaleLowerCase()
+      node.addEventListener(eventName,nextVal[k])
     }else{
-      node[k] = nextVal[k] //？
+      node[k] = nextVal[k] 
     }
   })
 }

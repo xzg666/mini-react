@@ -42,7 +42,7 @@ function workLoop(){
     while(currentTask){
         const callback = currentTask.callback
         currentTask.callback = null
-        callback()
+        callback && callback()
         pop(taskQueue)
         currentTask = peek(taskQueue)
     }
