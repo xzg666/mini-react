@@ -40,6 +40,16 @@ export function updateFragmentComponent(wip){
     reconcileChildren(wip,wip.props.children)
 }
 
+// 删除单个节点
+function deleteChild(returnFiber, childToDelete) {
+    // returnFiber.deletoins = [...]
+    const deletions = returnFiber.deletions;
+    if (deletions) {
+      returnFiber.deletions.push(childToDelete);
+    } else {
+      returnFiber.deletions = [childToDelete];
+    }
+  }
 
 
 //渲染子节点（遍历props，形成子fiber）
@@ -70,6 +80,11 @@ function reconcileChildren(wip,children){
                 alternate:oldFiber,
                 flags:Update
             })
+        }
+
+        //如果oldfiber存在，并且same不一致则进行删除逻辑
+        if(!same && oldFiber){
+            deleteChild(wip,oldFiber)//（父亲fiber，oldfiber的头子节点）
         }
 
         //因为i++了需要重新赋值下一个兄弟节点
