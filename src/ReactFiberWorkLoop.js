@@ -21,7 +21,6 @@ export function scheduleUpdateOnFiber(fiber){
 function performUnitOfWork(){
 
     const {tags} = wip
-    console.log('更新创建dom',wip)
     
     //1.更新当前组件
     switch (tags) {
@@ -64,7 +63,7 @@ function performUnitOfWork(){
 
 function workLoop(){
     while(wip){
-        //更新组件（创建dom节点）
+        //更新组件（走reconcileChildren协调diff，创建新的vnode）
         performUnitOfWork()
     }
 
@@ -94,7 +93,7 @@ function workLoop(){
 
 function commitRoot(){
     commitWorker(wipRoot)
-    console.log('提交dom',wipRoot)
+    // console.log('提交dom',wipRoot)
     //防止commitroot多次被调用
     wipRoot = null
 }
@@ -104,6 +103,8 @@ function commitWorker(wip){
         return
     }
 
+    console.log('wip',wip)
+
     //vdom => 真实dom
     //1.提交自己
     //parentNode是父dom节点
@@ -111,7 +112,12 @@ function commitWorker(wip){
     const parentNode = getParentNode(wip.return)
     const {flags,stateNode} = wip
     if(flags & Placement && stateNode){
-        parentNode.appendChild(stateNode)
+        // 1
+        // 0 1 2 3 4
+        // 2 1 3 4
+        const before = getHostSibling(wip.sibling);
+        insertOrAppendPlacementNode(stateNode, before, parentNode);
+        // parentNode.appendChild(stateNode);
     }
 
     if(flags & Update && stateNode){
@@ -128,6 +134,24 @@ function commitWorker(wip){
     commitWorker(wip.child)
     //3.提交兄弟节点
     commitWorker(wip.sibling)
+}
+
+function getHostSibling(sibling) {
+    while (sibling) {
+      if (sibling.stateNode && !(sibling.flags & Placement)) {
+        return sibling.stateNode;
+      }
+      sibling = sibling.sibling;
+    }
+    return null;
+  }
+
+function insertOrAppendPlacementNode(stateNode, before, parentNode) {
+    if (before) {
+      parentNode.insertBefore(stateNode, before);//插入到前面
+    } else {
+      parentNode.appendChild(stateNode);//插入到后面
+    }
 }
 
 function getParentNode(wip){

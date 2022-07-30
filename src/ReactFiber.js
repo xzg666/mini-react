@@ -21,6 +21,9 @@ export function createFiber(vnode,returnFiber){
         //flag保存增删改查标记
         flags:Placement,
 
+        //记录节点子当前层级下的位置
+        index:null,
+
         //记录节点在当前层级下的位置
         index:null,
 
