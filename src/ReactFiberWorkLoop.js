@@ -14,15 +14,13 @@ export function scheduleUpdateOnFiber(fiber){
     // console.log('scheduleUpdateOnFiber ',wip)
     // 任务调度
     scheduleCallback(workLoop)
-
-
 }
 
 function performUnitOfWork(){
 
     const {tags} = wip
     
-    //1.更新当前组件
+    //1.更新当前组件(beginwork阶段)
     switch (tags) {
         case HostComponent:
             updateHostComponent(wip)
@@ -103,7 +101,7 @@ function commitWorker(wip){
         return
     }
 
-    console.log('wip',wip)
+    // console.log('wip',wip)
 
     //vdom => 真实dom
     //1.提交自己
@@ -128,6 +126,11 @@ function commitWorker(wip){
     if(wip.deletions){
         //删除wip的子节点
         commitDeletions(wip.deletions,stateNode || parentNode)
+    }
+
+    //如果是函数组件，则执行hook的函数
+    if(wip.tags === FunctionComponent ){
+        invokeHooks(wip)
     }
 
     //2.提交子节点
@@ -179,4 +182,22 @@ function commitDeletions(deletions, parentNode) {
       tem = tem.child;
     }
     return tem.stateNode;
+  }
+
+  function invokeHooks(wip){
+    const {updateQueueOfEffect,updateQueueOfLayout} = wip
+
+    for (let i = 0; i < updateQueueOfLayout.length; i++) {
+        const effect = updateQueueOfLayout[i];
+        effect.create()
+    }
+
+    for (let i = 0; i < updateQueueOfEffect.length; i++) {
+        const effect = updateQueueOfEffect[i];
+        //加入宏任务
+        scheduleCallback(()=>{
+            effect.create()
+        })
+        
+    }
   }

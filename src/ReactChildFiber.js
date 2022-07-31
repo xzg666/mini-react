@@ -94,7 +94,7 @@ export function reconcileChildren(returnFiber,children){
     //new 2 1 3 4
     let lastPlacedIndex = 0
 
-    console.log('newfiber',newChildren)
+    // console.log('newfiber',newChildren)
 
     //*1.从左往右遍历，比较新老节点，如果节点可以复用，继续往右，否则停止
     for (; oldFiber && newIndex < newChildren.length; newIndex++) {

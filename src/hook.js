@@ -1,7 +1,9 @@
 import { scheduleUpdateOnFiber } from "./ReactFiberWorkLoop"
+import { areHookInputsEqual, HookLayout, HookPassive } from "./utlis"
 
 let currentlyRenderingFiber = null //当前渲染的fiber
 let workInProgressHook = null //当前正在工作的hook
+let currentHook = null //老hook
 
 
 //这个函数在更新组件ReactFiberReconciler/updateHostComponent中被调用
@@ -11,6 +13,11 @@ export function renderwithHook(wip){
 
     currentlyRenderingFiber.memorizedState = null
     workInProgressHook = null
+
+    //为了方便useEffect,useLayoutEffect区分开，并且与数组管理
+    //源码中是放一起，并且是个链表
+    currentlyRenderingFiber.updateQueueOfEffect = []
+    currentlyRenderingFiber.updateQueueOfLayout = []
 }
 
 //把当前的hook加到fiber上，并且更新当前正在更新的hook。区别是更新还是首次渲染
@@ -27,13 +34,17 @@ function updateWorkInProgressHook(){
         if(workInProgressHook){
             //连在当前hook后面
             workInProgressHook = hook = workInProgressHook.next
+            currentHook = currentHook.next
         }else{
             //hook0
             workInProgressHook = hook = currentlyRenderingFiber.memorizedState
+            currentHook = current.memorizedState
         }
 
     }else{
         //组件初次渲染
+        currentHook = null
+
         hook = {
             memorizedState: null, // state
             next: null // 下一个hook
@@ -91,4 +102,41 @@ function dispatchReducerAction(fiber,hook,reducer,action){
 
 export function useState(initState){
     return useReducer(null,initState)
+}
+
+
+// ----------------------------------------------
+ 
+function updateEffectImp(hookFlags,create,deps){
+    // 把当前的hook加到fiber上
+    const hook = updateWorkInProgressHook()
+
+    if(currentHook){
+        const prevEffect = currentHook.memorizedState
+        if(deps){
+            const prevDeps = prevEffect.deps
+            if(areHookInputsEqual(deps,prevDeps)){
+                //如果上一次与当前依赖值相同，那么不进行下面操作
+                return
+            }
+        }
+    }
+
+    const effect = {hookFlags,create,deps}
+
+    hook.memorizedState = effect
+
+    if(hookFlags & HookPassive){
+        currentlyRenderingFiber.updateQueueOfEffect.push(effect)
+    }else if(hookFlags & HookLayout){
+        currentlyRenderingFiber.updateQueueOfLayout.push(effect)
+    }
+}
+
+export function useEffect(create,deps){
+    return updateEffectImp(HookPassive,create,deps)
+}
+
+export function useLayoutEffect(create,deps){
+    return updateEffectImp(HookLayout,create,deps)
 }

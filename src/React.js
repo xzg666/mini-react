@@ -1,9 +1,10 @@
 import Component from "./Component";
-import {useReducer,useState} from './hook'
+import {useReducer,useState,useEffect,useLayoutEffect} from './hook'
 
 export {
     Component,
     useReducer,
-    useState
-    
+    useState,
+    useEffect,
+    useLayoutEffect
 }
