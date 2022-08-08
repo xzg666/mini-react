@@ -6,7 +6,7 @@ let workInProgressHook = null //当前正在工作的hook
 let currentHook = null //老hook
 
 
-//这个函数在更新组件ReactFiberReconciler/updateHostComponent中被调用
+//这个函数在更新组件ReactFiberReconciler/updateFunctionComponent中被调用
 export function renderwithHook(wip){
     //要从外面拿到fiber节点
     currentlyRenderingFiber = wip

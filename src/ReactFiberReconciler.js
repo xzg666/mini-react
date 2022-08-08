@@ -13,12 +13,12 @@ export function updateHostComponent(wip){
 
 //函数组件
 export function updateFunctionComponent(wip){
-    //传fiber给hook
+    //传fiber给hook，进行hook的updatequeue创建。（useeffect的函数effect）
     renderwithHook(wip)
 
     const {type,props} = wip
     const children = type(props)//执行函数
-    reconcileChildren(wip,children)//遍历props，形成子fiber,形成完整的fiber节点，有child。
+    reconcileChildren(wip,children)//协调（diff）遍历props，形成子fiber,形成完整的fiber节点，有child。
 }
 //类组件
 export function updateClassComponent(wip){

@@ -10,7 +10,7 @@ let wipRoot = null;
 export function scheduleUpdateOnFiber(fiber){
     
     wip = fiber 
-    wipRoot = fiber//记录根节点
+    wipRoot = fiber//记录根节点  值引用（修改了wip，wipRoot也会被修改）
     // console.log('scheduleUpdateOnFiber ',wip)
     // 任务调度
     scheduleCallback(workLoop)
@@ -147,7 +147,7 @@ function getHostSibling(sibling) {
       sibling = sibling.sibling;
     }
     return null;
-  }
+}
 
 function insertOrAppendPlacementNode(stateNode, before, parentNode) {
     if (before) {
@@ -168,12 +168,12 @@ function getParentNode(wip){
 }
 
 // deletions: fiber
-function commitDeletions(deletions, parentNode) {
-    for (let i = 0; i < deletions.length; i++) {
-      const deletion = deletions[i];
-      parentNode.removeChild(getStateNode(deletion));
+    function commitDeletions(deletions, parentNode) {
+        for (let i = 0; i < deletions.length; i++) {
+        const deletion = deletions[i];
+        parentNode.removeChild(getStateNode(deletion));
+        }
     }
-  }
   
   //不是每个fiber都有dom节点
   function getStateNode(fiber) {

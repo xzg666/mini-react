@@ -1,6 +1,7 @@
 import { peek, pop, push } from "./minHeap"
 
-let taskQueue = []
+let taskQueue = []//紧急任务
+// let timerQueue = [] //延时任务
 let taskIdCounter = 1
 
 export function scheduleCallback(callback){
@@ -36,6 +37,7 @@ const port = channel.port2
 channel.port1.onmessage = function(){
     workLoop()
 }
+//port1.onmessage会在port2.postMessage中执行（浏览器空闲的时候）
 
 function workLoop(){
     let currentTask = peek(taskQueue)

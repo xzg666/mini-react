@@ -18,7 +18,8 @@ function updateContainer(element,container){
         type:container.nodeName?.toLocaleLowerCase(),
         stateNode:containerInfo
     })
-    //组件初次渲染
+    console.log('第一次fiber',fiber,element,container)
+    //组件初次渲染和更新
     scheduleUpdateOnFiber(fiber)
 }
 
